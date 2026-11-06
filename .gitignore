@@ -1,0 +1,22 @@
+# 构建产物
+target/
+build/
+out/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# 日志
+logs/
+*.log
+
+# 本机数据库口令（示例文件 jdbc-local.properties.example 会提交）
+jdbc-local.properties
+
+# 系统文件
+.DS_Store
+Thumbs.db
