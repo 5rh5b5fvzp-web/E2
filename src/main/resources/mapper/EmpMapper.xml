@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jxy.emp.mapper.EmpMapper">
+
+    <!-- 显式结果映射：column 必须与数据库字段名一致 -->
+    <resultMap id="EmpResultMap" type="com.jxy.emp.entity.Emp">
+        <id column="emp_id" property="empId"/>
+        <result column="emp_name" property="empName"/>
+        <result column="gender" property="gender"/>
+        <result column="dept" property="dept"/>
+        <result column="post" property="post"/>
+        <result column="salary" property="salary"/>
+        <result column="hire_date" property="hireDate"/>
+        <result column="status" property="status"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 公共查询字段，统一加表别名，避免多表扩展时出现同名列歧义 -->
+    <sql id="Base_Column_List">
+        e.emp_id, e.emp_name, e.gender, e.dept, e.post, e.salary,
+        e.hire_date, e.status, e.email, e.phone, e.create_time, e.update_time
+    </sql>
+
+    <!-- 多条件模糊查询 + 分页：分页逻辑由 MyBatis-Plus 分页插件完成 -->
+    <select id="selectPageByCondition" resultMap="EmpResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM emp e
+        <where>
+            <if test="q.name != null and q.name != ''">
+                AND e.emp_name LIKE CONCAT('%', #{q.name}, '%')
+            </if>
+            <if test="q.gender != null and q.gender != ''">
+                AND e.gender = #{q.gender}
+            </if>
+            <if test="q.dept != null and q.dept != ''">
+                AND e.dept = #{q.dept}
+            </if>
+            <if test="q.status != null">
+                AND e.status = #{q.status}
+            </if>
+        </where>
+        ORDER BY e.emp_id DESC
+    </select>
+
+    <!-- 批量删除：foreach 拼接 IN 条件 -->
+    <delete id="deleteBatchByIds">
+        DELETE FROM emp
+        WHERE emp_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 按部门统计人数 -->
+    <select id="countByDept" resultType="long">
+        SELECT COUNT(*)
+        FROM emp
+        WHERE dept = #{dept}
+    </select>
+
+</mapper>
