@@ -1,0 +1,395 @@
+{
+  "info": {
+    "name": "EMP 员工管理 MIS 系统（实验二接口测试）",
+    "description": "可导入 ApiFox / Postman。先执行“认证/登录”，脚本会自动保存 JSESSIONID；其余受保护接口通过 Cookie 请求头携带会话。默认端口 8080，如使用其他端口请修改集合变量 baseUrl。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/emp-mis"
+    },
+    {
+      "key": "cookie",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 认证",
+      "item": [
+        {
+          "name": "登录（保存会话）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Emp@2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setCookie = pm.response.headers.get('Set-Cookie');",
+                  "if (setCookie) { pm.collectionVariables.set('cookie', setCookie.split(';')[0]); }",
+                  "pm.test('登录成功', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "未登录访问（预期 401）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/emps?page=1&size=2"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('未登录返回 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "当前登录用户",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/me"
+          }
+        },
+        {
+          "name": "退出登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 员工管理",
+      "item": [
+        {
+          "name": "分页列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps?page=1&size=5"
+          }
+        },
+        {
+          "name": "多条件模糊查询",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps?name=陈&gender=男&dept=研发中心&status=1&page=1&size=5"
+          }
+        },
+        {
+          "name": "新增员工",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empName\": \"岑野\",\n  \"gender\": \"男\",\n  \"dept\": \"研发中心\",\n  \"post\": \"后端工程师\",\n  \"salary\": 15800.00,\n  \"hireDate\": \"2025-06-18\",\n  \"status\": 1,\n  \"email\": \"cenye@xinghai-tech.com\",\n  \"phone\": \"13912345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        },
+        {
+          "name": "单条查询",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps/1"
+          }
+        },
+        {
+          "name": "修改员工",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empId\": 1,\n  \"empName\": \"陈亦航\",\n  \"gender\": \"男\",\n  \"dept\": \"研发中心\",\n  \"post\": \"Java 架构师\",\n  \"salary\": 28000.00,\n  \"hireDate\": \"2019-03-18\",\n  \"status\": 1,\n  \"email\": \"chenyihang@xinghai-tech.com\",\n  \"phone\": \"13800001001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        },
+        {
+          "name": "批量删除（不存在 ID，预期 404）",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[999998, 999999]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        },
+        {
+          "name": "部门列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/depts"
+          }
+        },
+        {
+          "name": "部门人数统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps/stat/研发中心"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 参数校验与边界",
+      "item": [
+        {
+          "name": "空姓名（预期 400）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empName\": \"\",\n  \"gender\": \"男\",\n  \"dept\": \"研发中心\",\n  \"post\": \"后端工程师\",\n  \"salary\": 15800.00,\n  \"hireDate\": \"2025-06-18\",\n  \"status\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        },
+        {
+          "name": "负薪资（预期 400）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empName\": \"负薪资测试\",\n  \"gender\": \"女\",\n  \"dept\": \"财务共享中心\",\n  \"post\": \"会计\",\n  \"salary\": -100.00,\n  \"hireDate\": \"2024-01-01\",\n  \"status\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        },
+        {
+          "name": "页码 0（预期 400）",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps?page=0&size=5"
+          }
+        },
+        {
+          "name": "每页 0 条（预期 400）",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps?page=1&size=0"
+          }
+        },
+        {
+          "name": "批量删除空数组（预期 400）",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        },
+        {
+          "name": "不存在的 ID（预期 404）",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "url": "{{baseUrl}}/emps/999999"
+          }
+        },
+        {
+          "name": "非法 JSON（预期 400）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{bad json}"
+            },
+            "url": "{{baseUrl}}/emps"
+          }
+        }
+      ]
+    }
+  ]
+}
