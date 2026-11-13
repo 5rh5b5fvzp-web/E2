@@ -1,8 +1,9 @@
-package com.jxy.emp.common;
+package com.jxy.mis.common;
 
 /**
  * 统一返回结果：code + message + data + timestamp。
- * 200 成功、400 参数错误、401 未登录、404 资源不存在、500 服务端异常。
+ *
+ * <p>约定：200 成功、400 参数错误、401 未登录、404 资源不存在、500 服务端异常。
  */
 public class Result<T> {
 
@@ -17,6 +18,10 @@ public class Result<T> {
 
     public static <T> Result<T> ok(T data) {
         return build(200, "success", data);
+    }
+
+    public static <T> Result<T> ok() {
+        return build(200, "success", null);
     }
 
     public static <T> Result<T> fail(String message) {

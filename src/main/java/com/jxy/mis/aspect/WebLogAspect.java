@@ -1,4 +1,4 @@
-package com.jxy.emp.aspect;
+package com.jxy.mis.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 /**
- * 请求日志切面：记录 Controller 方法、入参、耗时与异常。
+ * 请求日志切面：记录每个 Controller 方法的入参、耗时与异常。
  */
 @Aspect
 @Component
@@ -19,7 +19,7 @@ public class WebLogAspect {
 
     private static final Logger log = LoggerFactory.getLogger(WebLogAspect.class);
 
-    @Pointcut("execution(* com.jxy.emp.controller..*(..))")
+    @Pointcut("execution(* com.jxy.mis.controller..*(..))")
     public void controllerPointcut() {
     }
 

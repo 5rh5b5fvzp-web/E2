@@ -14,9 +14,9 @@
 
     <!-- 文件输出：滚动保存，便于事后排查 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/emp-mis.log</file>
+        <file>${LOG_HOME}/E2.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/emp-mis.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/E2.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -26,7 +26,7 @@
     </appender>
 
     <!-- Mapper 包开启 DEBUG，控制台可看到 MyBatis 执行的 SQL 与参数 -->
-    <logger name="com.jxy.emp.mapper" level="DEBUG"/>
+    <logger name="com.jxy.mis.mapper" level="DEBUG"/>
     <logger name="org.springframework" level="INFO"/>
     <logger name="com.alibaba.druid" level="WARN"/>
 

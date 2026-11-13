@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.jxy</groupId>
-    <artifactId>emp-mis</artifactId>
+    <artifactId>E2</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
-    <name>emp-mis</name>
-    <description>EMP 员工管理 MIS 系统（SSM 全注解整合）</description>
+    <name>E2</name>
+    <description>实验二：学生成绩管理 MIS 系统（SSM 全注解整合，主题沿用实验一）</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -153,7 +153,7 @@
     </dependencies>
 
     <build>
-        <finalName>emp-mis</finalName>
+        <finalName>E2</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,4 +1,4 @@
-package com.jxy.emp.config;
+package com.jxy.mis.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -15,34 +15,34 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 
 /**
- * Spring 根容器配置：数据源、MyBatis-Plus、Mapper 扫描、声明式事务。
- * 注意：这里只扫描 Service 层，Controller 交给 SpringMVC 子容器，避免父子容器重复注册。
+ * Spring 根容器：数据源、MyBatis-Plus、Mapper 扫描、声明式事务。
+ *
+ * <p>父子容器分工：这里只扫 Service 层；Controller 交给 SpringMVC 子容器，
+ * 避免同一个 Bean 被两个容器各创建一份。
  */
 @Configuration
-@ComponentScan(basePackages = "com.jxy.emp.service")
+@ComponentScan(basePackages = "com.jxy.mis.service")
 @PropertySources({
-        // 本机口令文件放在前面，优先级高于默认配置；文件不存在时忽略
+        // 本机口令文件优先；文件不存在时自动忽略
         @PropertySource(value = "classpath:jdbc-local.properties", ignoreResourceNotFound = true),
-        @PropertySource("classpath:jdbc.properties"),
-        @PropertySource("classpath:app.properties")
+        @PropertySource("classpath:jdbc.properties")
 })
 @EnableTransactionManagement
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class SpringConfig {
 
+    /** Druid 连接池：连接四要素来自配置文件，不在 Java 代码里硬编码 */
     @Bean
     public DataSource dataSource(@Value("${jdbc.driver}") String driver,
                                  @Value("${jdbc.url}") String url,
                                  @Value("${jdbc.username}") String username,
-                                 @Value("${jdbc.password:}") String password) {
+                                 @Value("${jdbc.password:${DB_PASSWORD:}}") String password) {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName(driver);
         dataSource.setUrl(url);
@@ -59,22 +59,23 @@ public class SpringConfig {
     }
 
     /**
-     * 必须使用 MyBatis-Plus 提供的 MybatisSqlSessionFactoryBean，
-     * 否则 BaseMapper 的通用 CRUD 不会被注册，运行时会报 Invalid bound statement。
+     * 必须使用 MyBatis-Plus 的 MybatisSqlSessionFactoryBean：
+     * 用原生 SqlSessionFactoryBean 时 BaseMapper 的通用 CRUD 不会注册，
+     * 运行时会报 Invalid bound statement。
      */
     @Bean
-    public MybatisSqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) throws IOException {
+    public MybatisSqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) {
         MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
         factory.setDataSource(dataSource);
-        factory.setTypeAliasesPackage("com.jxy.emp.entity");
-        factory.setMapperLocations(
-                new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/*.xml"));
+        factory.setTypeAliasesPackage("com.jxy.mis.entity");
 
         MybatisConfiguration configuration = new MybatisConfiguration();
+        // 数据库下划线字段自动映射到 Java 驼峰属性
         configuration.setMapUnderscoreToCamelCase(true);
         configuration.setLogImpl(Slf4jImpl.class);
         factory.setConfiguration(configuration);
 
+        // 分页插件必须用 Java API 注册
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         PaginationInnerInterceptor pagination = new PaginationInnerInterceptor(DbType.MYSQL);
         pagination.setMaxLimit(100L);
@@ -88,7 +89,7 @@ public class SpringConfig {
     @Bean
     public static MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer configurer = new MapperScannerConfigurer();
-        configurer.setBasePackage("com.jxy.emp.mapper");
+        configurer.setBasePackage("com.jxy.mis.mapper");
         return configurer;
     }
 

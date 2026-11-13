@@ -1,7 +1,7 @@
-package com.jxy.emp.common;
+package com.jxy.mis.common;
 
 /**
- * 业务异常：由全局异常处理器统一转换为 Result。
+ * 业务异常：Service 层主动抛出，由全局异常处理器转成统一返回格式。
  */
 public class BusinessException extends RuntimeException {
 
