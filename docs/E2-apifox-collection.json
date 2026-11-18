@@ -1,0 +1,271 @@
+{
+  "info": {
+    "name": "E2 实验二 学生成绩管理 MIS",
+    "description": "SSM 全注解整合实验二接口集合。先执行「登录」获取 Session Cookie，再调其他接口。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/E2"
+    }
+  ],
+  "item": [
+    {
+      "name": "认证",
+      "item": [
+        {
+          "name": "登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"root\",\"password\":\"123456\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "当前用户",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "退出登录",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "学生管理",
+      "item": [
+        {
+          "name": "分页 + 多条件查询",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students?page=1&size=5&stuName=&stuNo=&gender=&classId=&status="
+          }
+        },
+        {
+          "name": "单条查询",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/1"
+          }
+        },
+        {
+          "name": "新增学生",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"stuNo\":\"2024010300\",\"stuName\":\"测试学生\",\"gender\":\"女\",\"phone\":\"13912345678\",\"email\":\"test@example.com\",\"classId\":2,\"enrollDate\":\"2024-09-01\",\"status\":1}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          }
+        },
+        {
+          "name": "修改学生",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"stuId\":1,\"stuNo\":\"2024010201\",\"stuName\":\"张小明\",\"gender\":\"男\",\"classId\":1,\"enrollDate\":\"2024-09-01\",\"status\":1}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          }
+        },
+        {
+          "name": "单条删除",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/11"
+          }
+        },
+        {
+          "name": "批量删除",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[11,12]"
+            },
+            "url": "{{baseUrl}}/api/students"
+          }
+        },
+        {
+          "name": "班级人数统计",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/stat/class/1"
+          }
+        },
+        {
+          "name": "参数校验：学号格式错误",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"stuNo\":\"abc\",\"stuName\":\"\",\"classId\":1}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          }
+        },
+        {
+          "name": "分页边界：page=0",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students?page=0&size=5"
+          }
+        }
+      ]
+    },
+    {
+      "name": "成绩管理",
+      "item": [
+        {
+          "name": "成绩分页查询",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/scores?page=1&size=5&stuNo=&stuName=&courseId=&term="
+          }
+        },
+        {
+          "name": "录入成绩",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"stuId\":1,\"courseId\":5,\"term\":\"2025-2026-1\",\"score\":88.5,\"examDate\":\"2026-01-10\"}"
+            },
+            "url": "{{baseUrl}}/api/scores"
+          }
+        },
+        {
+          "name": "修改成绩",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"scoreId\":16,\"stuId\":1,\"courseId\":5,\"term\":\"2025-2026-1\",\"score\":91,\"examDate\":\"2026-01-10\"}"
+            },
+            "url": "{{baseUrl}}/api/scores"
+          }
+        },
+        {
+          "name": "成绩统计",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/scores/stat/1"
+          }
+        },
+        {
+          "name": "删除成绩",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/scores/16"
+          }
+        }
+      ]
+    },
+    {
+      "name": "基础数据",
+      "item": [
+        {
+          "name": "班级列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/classes"
+          }
+        },
+        {
+          "name": "课程列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "事务验证",
+      "item": [
+        {
+          "name": "加事务（应回滚）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/dev/tx/tx"
+          }
+        },
+        {
+          "name": "不加事务（数据保留）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/dev/tx/no-tx"
+          }
+        }
+      ]
+    }
+  ]
+}
