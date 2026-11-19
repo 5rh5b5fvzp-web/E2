@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "E2 实验二 学生成绩管理 MIS",
-    "description": "SSM 全注解整合实验二接口集合。先执行「登录」获取 Session Cookie，再调其他接口。",
+    "description": "SSM 全注解整合实验二接口集合。先执行「登录」获取 Session Cookie，再调其他接口。账号：root/123456（ADMIN）、teacher/123456（TEACHER）、student01/123456（STUDENT，仅看本人成绩）。",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -27,6 +27,40 @@
             "body": {
               "mode": "raw",
               "raw": "{\"username\":\"root\",\"password\":\"123456\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "登录（教师 TEACHER）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"teacher\",\"password\":\"123456\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "登录（学生 STUDENT）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"student01\",\"password\":\"123456\"}"
             },
             "url": "{{baseUrl}}/api/auth/login"
           }

@@ -24,6 +24,12 @@ public class Admin {
 
     private Integer status;
 
+    /** 角色：ADMIN / TEACHER / STUDENT */
+    private String role;
+
+    /** 学生账号关联的学生ID（仅 STUDENT 使用） */
+    private Integer stuId;
+
     public Integer getAdminId() {
         return adminId;
     }
@@ -64,6 +70,22 @@ public class Admin {
         this.status = status;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Integer getStuId() {
+        return stuId;
+    }
+
+    public void setStuId(Integer stuId) {
+        this.stuId = stuId;
+    }
+
     @Override
     public String toString() {
         return "Admin{" +
@@ -71,6 +93,8 @@ public class Admin {
                 ", username='" + username + '\'' +
                 ", realName='" + realName + '\'' +
                 ", status=" + status +
+                ", role='" + role + '\'' +
+                ", stuId=" + stuId +
                 '}';
     }
 }

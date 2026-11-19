@@ -7,6 +7,7 @@ public class ScoreQueryDTO {
 
     private String stuNo;
     private String stuName;
+    private Integer stuId;
     private Integer courseId;
     private String term;
 
@@ -24,6 +25,14 @@ public class ScoreQueryDTO {
 
     public void setStuName(String stuName) {
         this.stuName = stuName;
+    }
+
+    public Integer getStuId() {
+        return stuId;
+    }
+
+    public void setStuId(Integer stuId) {
+        this.stuId = stuId;
     }
 
     public Integer getCourseId() {

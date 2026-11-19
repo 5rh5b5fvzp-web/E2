@@ -1,7 +1,9 @@
 package com.jxy.mis.controller;
 
 import com.jxy.mis.common.BusinessException;
+import com.jxy.mis.common.RequireRole;
 import com.jxy.mis.common.Result;
+import com.jxy.mis.common.Role;
 import com.jxy.mis.service.StudentService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/dev")
+@RequireRole(Role.ADMIN)
 public class DevController {
 
     private final StudentService studentService;

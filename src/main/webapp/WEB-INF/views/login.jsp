@@ -51,8 +51,9 @@
                     username: document.getElementById('username').value.trim(),
                     password: document.getElementById('password').value
                 }
-            }).then(function () {
-                window.location.href = CTX + '/students';
+            }).then(function (account) {
+                var target = account && account.role === 'STUDENT' ? '/scores' : '/students';
+                window.location.href = CTX + target;
             }).catch(function (error) {
                 errorBox.textContent = error.message;
                 errorBox.className = 'login-error show';

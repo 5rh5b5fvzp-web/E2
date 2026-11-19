@@ -11,7 +11,7 @@
 <div class="topbar">
     <div class="brand">学生成绩管理 MIS<small>SSM 全注解整合 · 实验二</small></div>
     <nav>
-        <a href="${pageContext.request.contextPath}/students">学生管理</a>
+        <a id="navStudents" href="${pageContext.request.contextPath}/students">学生管理</a>
         <a class="active" href="${pageContext.request.contextPath}/scores">成绩管理</a>
     </nav>
     <div class="user">
@@ -22,7 +22,7 @@
 
 <div class="container">
     <!-- 查询区 -->
-    <div class="card">
+    <div class="card" id="searchCard">
         <div class="card-title"><span>成绩查询</span></div>
         <form id="searchForm" class="search-form" autocomplete="off">
             <div class="field">
@@ -132,7 +132,11 @@
             selected: new Set(),
             editingId: null,
             students: [],
-            courses: []
+            courses: [],
+            role: '',
+            stuId: null,
+            canEdit: false,
+            canDelete: false
         };
 
         function $(id) {
@@ -144,18 +148,40 @@
         }
 
         function loadMe() {
-            api('/api/auth/me').then(function (admin) {
-                $('userName').textContent = (admin.realName || admin.username);
+            return api('/api/auth/me').then(function (admin) {
+                var roleLabels = {ADMIN: '系统管理员', TEACHER: '教务老师', STUDENT: '学生'};
+                $('userName').textContent = (admin.realName || admin.username)
+                    + ' · ' + (roleLabels[admin.role] || admin.role);
+                state.role = admin.role;
+                state.stuId = admin.stuId;
+                state.canEdit = admin.role === 'ADMIN' || admin.role === 'TEACHER';
+                state.canDelete = admin.role === 'ADMIN';
+
+                if (admin.role === 'STUDENT') {
+                    $('navStudents').style.display = 'none';
+                    $('addBtn').style.display = 'none';
+                    $('batchDeleteBtn').style.display = 'none';
+                    $('searchCard').style.display = 'none';
+                    $('checkAll').style.display = 'none';
+                    if (admin.stuId) {
+                        showStat(admin.stuId);
+                    }
+                } else if (admin.role === 'TEACHER') {
+                    $('batchDeleteBtn').style.display = 'none';
+                }
             }).catch(function () {
                 /* 401 已统一跳转 */
             });
         }
 
         function loadOptions() {
-            return Promise.all([
-                api('/api/students?page=1&size=100').then(function (page) {
+            var studentsPromise = state.role === 'STUDENT'
+                ? Promise.resolve()
+                : api('/api/students?page=1&size=100').then(function (page) {
                     state.students = page.records || [];
-                }),
+                });
+            return Promise.all([
+                studentsPromise,
                 api('/api/courses').then(function (list) {
                     state.courses = list || [];
                 })
@@ -222,8 +248,19 @@
             }
             var html = '';
             state.records.forEach(function (row) {
+                var actions = '';
+                if (state.canEdit) {
+                    actions += '<button class="btn-link" type="button" data-action="edit" data-id="' + row.scoreId + '">编辑</button>';
+                }
+                actions += '<button class="btn-link" type="button" data-action="stat" data-id="' + row.stuId + '">统计</button>';
+                if (state.canDelete) {
+                    actions += '<button class="btn-link danger" type="button" data-action="delete" data-id="' + row.scoreId + '">删除</button>';
+                }
+                var checkbox = state.role === 'STUDENT'
+                    ? ''
+                    : '<input type="checkbox" class="row-check" data-id="' + row.scoreId + '">';
                 html += '<tr>'
-                    + '<td><input type="checkbox" class="row-check" data-id="' + row.scoreId + '"></td>'
+                    + '<td>' + checkbox + '</td>'
                     + '<td>' + escapeHtml(row.stuNo) + '</td>'
                     + '<td>' + escapeHtml(row.stuName) + '</td>'
                     + '<td>' + escapeHtml(row.className || '-') + '</td>'
@@ -232,11 +269,7 @@
                     + '<td>' + escapeHtml(row.term) + '</td>'
                     + '<td class="' + scoreClass(row.score) + '">' + escapeHtml(row.score) + '</td>'
                     + '<td>' + escapeHtml(row.examDate || '-') + '</td>'
-                    + '<td>'
-                    + '<button class="btn-link" type="button" data-action="edit" data-id="' + row.scoreId + '">编辑</button>'
-                    + '<button class="btn-link" type="button" data-action="stat" data-id="' + row.stuId + '">统计</button>'
-                    + '<button class="btn-link danger" type="button" data-action="delete" data-id="' + row.scoreId + '">删除</button>'
-                    + '</td>'
+                    + '<td>' + actions + '</td>'
                     + '</tr>';
             });
             tbody.innerHTML = html;
@@ -449,10 +482,12 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             bindEvents();
-            loadMe();
-            loadOptions().then(loadScores).catch(function (error) {
-                toast(error.message, 'error');
-            });
+            loadMe()
+                .then(loadOptions)
+                .then(loadScores)
+                .catch(function (error) {
+                    toast(error.message, 'error');
+                });
         });
     })();
 </script>

@@ -1,6 +1,7 @@
 package com.jxy.mis.config;
 
 import com.jxy.mis.interceptor.LoginInterceptor;
+import com.jxy.mis.interceptor.RoleInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -63,6 +64,11 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/login", "/api/auth/login", "/",
+                        "/index.jsp", "/favicon.ico", "/error", "/static/**");
+        // 角色权限校验必须在登录拦截之后执行
+        registry.addInterceptor(new RoleInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login", "/api/auth/login", "/",
                         "/index.jsp", "/favicon.ico", "/error", "/static/**");

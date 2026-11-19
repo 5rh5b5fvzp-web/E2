@@ -153,7 +153,8 @@ INSERT INTO t_score (stu_id, course_id, term, score, exam_date) VALUES
 -- ------------------------------------------------------------
 -- 5. 系统用户表
 --    密码存储：SHA-256(明文 + ":" + 用户名)
---    root / 123456    teacher / 123456
+--    角色：ADMIN 管理员 / TEACHER 教务 / STUDENT 学生
+--    root、teacher、student01、student02 密码均为 123456
 -- ------------------------------------------------------------
 CREATE TABLE t_admin (
     admin_id  INT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
@@ -161,9 +162,14 @@ CREATE TABLE t_admin (
     password  VARCHAR(64) NOT NULL COMMENT 'SHA-256 密码摘要',
     real_name VARCHAR(50) COMMENT '姓名',
     status    TINYINT DEFAULT 1 COMMENT '状态：1启用 0禁用',
-    UNIQUE KEY uk_admin_username (username)
+    role      VARCHAR(20) NOT NULL DEFAULT 'ADMIN' COMMENT '角色：ADMIN/TEACHER/STUDENT',
+    stu_id    INT NULL COMMENT '学生账号关联的学生ID（仅 STUDENT 使用）',
+    UNIQUE KEY uk_admin_username (username),
+    KEY idx_admin_role (role)
 ) COMMENT='系统用户表';
 
-INSERT INTO t_admin (username, password, real_name, status) VALUES
-('root', '3813cc6b6f416c1a7435857359338cd23e02fd42e332c43aa7ab6403b4c6b90e', '系统管理员', 1),
-('teacher', '4908e6a9292cce9d125694351a442751fcb21b90a53999b594260f2f1a79c0bc', '教务老师', 1);
+INSERT INTO t_admin (username, password, real_name, status, role, stu_id) VALUES
+('root', '3813cc6b6f416c1a7435857359338cd23e02fd42e332c43aa7ab6403b4c6b90e', '系统管理员', 1, 'ADMIN', NULL),
+('teacher', '4908e6a9292cce9d125694351a442751fcb21b90a53999b594260f2f1a79c0bc', '教务老师', 1, 'TEACHER', NULL),
+('student01', '43473628dd9a2e73917a88ba6891b332f099df7041eb9b661207a757a11e21e8', '张小明', 1, 'STUDENT', 1),
+('student02', '3834786625d7aff7e207be6b76df53e1d95e0938b387aec491db0e141ed615d7', '李思思', 1, 'STUDENT', 2);

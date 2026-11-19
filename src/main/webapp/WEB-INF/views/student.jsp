@@ -159,7 +159,8 @@
             total: 0,
             records: [],
             selected: new Set(),
-            editingId: null
+            editingId: null,
+            canEdit: false
         };
 
         function $(id) {
@@ -172,7 +173,14 @@
 
         function loadMe() {
             api('/api/auth/me').then(function (admin) {
-                $('userName').textContent = (admin.realName || admin.username);
+                var roleLabels = {ADMIN: '系统管理员', TEACHER: '教务老师', STUDENT: '学生'};
+                $('userName').textContent = (admin.realName || admin.username)
+                    + ' · ' + (roleLabels[admin.role] || admin.role);
+                state.canEdit = admin.role === 'ADMIN';
+                if (!state.canEdit) {
+                    $('addBtn').style.display = 'none';
+                    $('batchDeleteBtn').style.display = 'none';
+                }
             }).catch(function () {
                 /* 401 已由 api() 统一跳转 */
             });
@@ -231,6 +239,10 @@
                 var statusBadge = student.status === 1
                     ? '<span class="badge">在读</span>'
                     : '<span class="badge off">休学</span>';
+                var actionHtml = state.canEdit
+                    ? ('<button class="btn-link" type="button" data-action="edit" data-id="' + student.stuId + '">编辑</button>'
+                        + '<button class="btn-link danger" type="button" data-action="delete" data-id="' + student.stuId + '">删除</button>')
+                    : '<span style="color:#9ca3af">-</span>';
                 html += '<tr>'
                     + '<td><input type="checkbox" class="row-check" data-id="' + student.stuId + '"></td>'
                     + '<td>' + escapeHtml(student.stuNo) + '</td>'
@@ -241,10 +253,7 @@
                     + '<td>' + escapeHtml(student.email || '-') + '</td>'
                     + '<td>' + escapeHtml(student.enrollDate || '-') + '</td>'
                     + '<td>' + statusBadge + '</td>'
-                    + '<td>'
-                    + '<button class="btn-link" type="button" data-action="edit" data-id="' + student.stuId + '">编辑</button>'
-                    + '<button class="btn-link danger" type="button" data-action="delete" data-id="' + student.stuId + '">删除</button>'
-                    + '</td>'
+                    + '<td>' + actionHtml + '</td>'
                     + '</tr>';
             });
             tbody.innerHTML = html;

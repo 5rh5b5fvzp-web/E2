@@ -71,7 +71,8 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             wrapper.in(Score::getStuId, stuIds);
         }
 
-        wrapper.eq(condition.getCourseId() != null, Score::getCourseId, condition.getCourseId())
+        wrapper.eq(condition.getStuId() != null, Score::getStuId, condition.getStuId())
+                .eq(condition.getCourseId() != null, Score::getCourseId, condition.getCourseId())
                 .eq(StringUtils.hasText(condition.getTerm()), Score::getTerm, condition.getTerm())
                 .orderByDesc(Score::getTerm)
                 .orderByAsc(Score::getScoreId);
